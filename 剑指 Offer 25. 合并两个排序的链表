@@ -1,0 +1,71 @@
+一、问题描述：剑指 Offer 25. 合并两个排序的链表
+
+输入两个递增排序的链表，合并这两个链表并使新链表中的节点仍然是递增排序的。
+
+示例1：
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+
+限制：0 <= 链表长度 <= 1000
+
+
+二、思路分析
+（1）方法一：使用递归
+    先判断节点是不是非空，满足l1和l2都不为空时，比较l1和l2指向节点的值是否相等，不等的话比较谁小，再用递归记录小的链表所在节点的下一个节点next，得到最终的结果
+
+（2）方法二：使用迭代
+    1、定义头结点
+    2、若 l1l指向的结点值 < l2指向的结点值，则将 l1 链接到头结点的 next 位置
+    3、否则将 l2 链接到头结点的 next 位置
+    4、循环进行，直至 l1l 或 l2l 为 NULL
+    5、最后，将l1或l2中剩下的部分，链接到头结点后面
+
+
+三、代码
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        //方法一：使用递归
+        /*
+        if (l1 == null) {
+            return l2;
+        }
+        if (l2 == null) {
+            return l1;
+        }
+        if(l1.val <= l2.val) {
+            l1.next = mergeTwoLists(l1.next,l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1,l2.next);
+            return l2;
+        }
+        */
+
+        //方法二：使用迭代
+        ListNode dum = new ListNode(0), 
+        cur = dum;
+        while(l1 != null && l2 != null) {
+            //比较一下，哪个小就把哪个放到新的链表中
+            if(l1.val < l2.val) {
+                cur.next = l1;
+                l1 = l1.next;
+            }
+            else {
+                cur.next = l2;
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+        //然后把那个不为空的链表挂到新的链表中
+        cur.next = l1 != null ? l1 : l2;
+        return dum.next;
+    }
+}
