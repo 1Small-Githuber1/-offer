@@ -1,0 +1,173 @@
+一、问题描述：剑指 Offer 35. 复杂链表的复制
+
+请实现 copyRandomList 函数，复制一个复杂链表。在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。
+
+示例 1：
+输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
+输出：[[7,null],[13,0],[11,4],[10,2],[1,0]]
+
+示例 2：
+输入：head = [[1,1],[2,1]]
+输出：[[1,1],[2,1]]
+
+示例 3：
+输入：head = [[3,null],[3,0],[3,null]]
+输出：[[3,null],[3,0],[3,null]]
+
+示例 4：
+输入：head = []
+输出：[]
+解释：给定的链表为空（空指针），因此返回 null。
+ 
+提示：
+-10000 <= Node.val <= 10000
+Node.random 为空（null）或指向链表中的节点。
+节点数目不超过 1000 。
+
+
+二、思路分析
+（1）方法一：通过HashMap键值对的关系复制节点并输出值的部分
+1.创建HashMap
+2.复制结点值
+3.复制指向（next,random）
+
+（2）方法二：原地复制，分段输出，分为三部分
+    2.1、复制每一个节点，使得复制后的节点都在当前节点的下一个节点
+    //拷贝链表
+    private void copy(Node head){
+        while(head!=null){
+            Node cloneNode = new Node(head.val);
+            Node nextNode = head.next;
+            head.next = cloneNode;
+            cloneNode.next = nextNode;
+            head = cloneNode.next;
+        }
+    }
+    
+    2.2、原生链表的节点的指向任意节点，使复制的节点也都指向某一任意节点
+    //指定随机指针
+    private void randomDirect(Node head){
+        while(head!=null){
+            Node cloneNode = head.next;
+            if(head.random!=null){
+                Node direct = head.random;
+                cloneNode.random = direct.next;
+            }
+            head = cloneNode.next;
+        }
+    }
+    
+    2.3、重新连接节点，把原生节点重新连接起来，把克隆后的节点连接起来
+    //重新连接 链表
+    private Node reList(Node head){
+        Node cloneNode = head.next;
+        Node cloneHead = cloneNode;
+        head.next = cloneNode.next;
+        head = head.next;
+        while(head!=null){
+            cloneNode.next = head.next;
+            head.next = head.next.next;
+            head = head.next;
+            cloneNode = cloneNode.next;
+        }
+        return cloneHead;
+    }
+
+
+三、代码
+/*
+// Definition for a Node.
+class Node {
+    int val;
+    Node next;
+    Node random;
+
+    public Node(int val) {
+        this.val = val;
+        this.next = null;
+        this.random = null;
+    }
+}
+*/
+class Solution {
+    public Node copyRandomList(Node head) {
+        //方法一：HashMap
+        if(head == null) {
+            return null;
+        }
+
+        //创建HashMap 里面存放的是(源节点,拷贝节点)的映射关系
+        Map<Node,Node> hm = new HashMap<>();
+        Node cur = head;
+        //复制结点值
+        while(cur != null) {
+            //存储put:<key,value1>
+            hm.put(cur,new Node(cur.val));
+            cur = cur.next;
+        }
+
+        //将hm中第二项拷贝的节点组成一个新的链表
+        //复制结点指向
+        Node cur2 = head;
+        while(cur2 != null) {
+            //得到get:<key>.value
+            hm.get(cur2).next = hm.get(cur2.next);  //新结点next指向同旧结点的next指向
+            hm.get(cur2).random = hm.get(cur2.random);  //新结点random指向同旧结点的random指向
+            cur2 = cur2.next;
+        }
+
+        //返回复制的链表
+        return hm.get(head);
+
+
+
+        //方法二：原地复制，原来节点后增加一个复制节点  内存高点
+        /*
+        if(head == null) {
+            return null;
+        }
+
+        //分为三步：1、完成源节点的复制
+        //         2、完成复制节点的random指针复制
+        //         3、将链表一分为二，取复制后的节点链表
+        //1、完成链表的复制
+        Node cur = head;
+        while(cur != null) {
+            Node copyNode = new Node(cur.val);   //创建一个复制节点
+            copyNode.next = cur.next;      //复制节点的next节点，就是源节点的next节点
+            cur.next = copyNode;           //源节点的next节点就是新复制的节点
+            cur = copyNode.next;           //源节点指向第二个源节点
+        }
+
+        //2、完成链表复制节点的随机指针复制
+        Node cur2 = head;
+        while(cur2 != null) {           
+            if(cur2.random != null) {      // 要判断原来节点有没有random节点
+                cur2.next.random = cur2.random.next;  //cur2.next就是复制的节点，random关系同样继承,因为random节点也有相同的复制节点
+            }
+            cur2 = cur2.next.next;
+        }
+
+        //3、将链表一分为二，取复制后的节点链表
+        Node copyNode3 = head.next;    //复制节点的首个节点
+        Node cur3 = head;  //头结点
+        Node curCopy3 = head.next;     //原节点的首个节点
+        while(cur3 != null) {
+            cur3.next = cur3.next.next;
+            cur3 = cur3.next;
+            if(curCopy3.next != null) {
+                curCopy3.next = curCopy3.next.next;
+                curCopy3 = curCopy3.next;
+            }
+        }
+        return copyNode3;
+        */
+    }
+}
+
+
+四、结果显示
+执行结果：通过
+
+执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+内存消耗：39.6 MB, 在所有 Java 提交中击败了29.27%的用户
