@@ -1,0 +1,110 @@
+一、问题描述：剑指 Offer 04. 二维数组中的查找
+
+在一个 n * m 的二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+
+示例:
+现有矩阵 matrix 如下：
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+
+给定 target = 5，返回 true。
+给定 target = 20，返回 false。
+
+限制：
+0 <= n <= 1000
+0 <= m <= 1000
+
+
+二、思路分析
+（1）方法一：暴力法 两层for循环 性能最差  时间复杂度n*m
+    这种方法没什么好说的吧，大家都会，就是提醒一下：这种方法适合乱序，对于这种从左到右，从上到下的二维数组排列，不太适合，不然题目的意义就没意义了，对吧。
+
+（2）方法二：以右上角为基准点查找  时间复杂度m+n
+    其实右上角和左下角是一样的道理，该元素左边比它小，如果target小于它，则可以向左移动一位，这样就消除了一列；如果target大于它，则可以向下移动一位，这样就消除了一行，因此时间复杂度是m+n，毋庸置疑
+
+（3）方法三：二分查找 时间复杂度为mlogn
+    其实这种方法只用了行或者列，这里采用列做变换，在列上采用mid值来二分查找，比较的行数未变；而且二分查找可以用递归，省时省力。
+
+
+三、代码
+class Solution {
+    public boolean findNumberIn2DArray(int[][] matrix, int target) {
+        //方法一：暴力法 两层for循环 性能最差  时间复杂度n*m
+        /*
+        if(matrix == null || matrix.length == 0) {
+            return false;
+        }
+        int n = matrix.length;
+        int m = matrix[0].length;
+        for(int i = 0;i<n;i++) {
+            for(int j = 0;j<m;j++) {
+                if(matrix[i][j] == target) {
+                    return true;
+                }
+            }
+        }
+        return false;
+        */
+
+
+        //方法二：以右上角为基准点查找  时间复杂度m+n
+        /*
+        if(matrix == null || matrix.length == 0) {
+            return false;
+        }
+        int n = matrix.length;
+        int m = matrix[0].length;
+
+        int row = 0,col = m-1;
+        while(row<n && col>=0) {
+            if(matrix[row][col] > target) {
+                col--;
+            } else if(matrix[row][col] < target) {
+                row++;
+            } else {
+                return true;
+            }
+        }
+        return false;
+        */
+
+
+        //方法三：二分查找 时间复杂度为mlogn
+        for(int i = 0;i<matrix.length;i++) {
+            if(binarySearch(matrix[i],0,matrix[0].length-1,target)) {
+                return true;
+            }           
+        }  
+        return false;
+        
+    }
+
+    
+    private boolean binarySearch(int[] arr,int left,int right,int target) {
+        int mid = (left + right) / 2;
+        if(left > right) {
+            return false;
+        }
+        if(arr[mid] == target) {
+            return true;
+        } else if(arr[mid] > target) {
+            return binarySearch(arr,left,mid-1,target);
+        } else {
+            return binarySearch(arr,mid+1,right,target);
+        }
+    }  
+
+}
+
+
+四、结果分析
+    根据代码提交来看，方法三和方法二相同时间，可三比二消耗空间少了一点，总之，方法二和方法三都可取，要是面试中问，最好回答二，多说一个三，可能加分
+
+执行结果：通过
+执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+内存消耗：45.3 MB, 在所有 Java 提交中击败了96.36%的用户
