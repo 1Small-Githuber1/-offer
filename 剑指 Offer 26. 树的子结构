@@ -1,0 +1,111 @@
+一、问题描述：剑指 Offer 26. 树的子结构
+
+输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)。B是A的子结构， 即A中有出现和B相同的结构和节点值。
+
+例如:
+给定的树 A:
+     3
+    / \
+   4   5
+  / \
+ 1   2
+ 
+给定的树 B：
+   4 
+  /
+ 1
+ 
+返回 true，因为 B 与 A 的一个子树拥有相同的结构和节点值。
+
+
+示例 1：
+输入：A = [1,2,3], B = [3,1]
+输出：false
+
+示例 2：
+输入：A = [3,4,5,1,2], B = [4,1]
+输出：true
+
+限制：0 <= 节点个数 <= 10000
+
+
+二、思路分析
+    自己的思路就分为四小步：
+        （1）先找根相同的节点；
+        （2）然后根据B来遍历A
+        （3）如果遍历完B，A相同，结束
+        （4）否则继续找根相同的节点
+
+
+但是看了看题解，有位大佬写出了很是详细的分析，搬过来和大家嚼嚼，学到了不少
+
+A、解题思路：
+   若树B是树A的子结构，则子结构的根节点可能为树A的任意一个节点。因此，判断树B是否是树A的子结构，需完成以下两步工作：
+      1、先序遍历树A中的每个节点（对应函数 isSubStructure(A, B)）
+      2、判断树A中以根节点的子树是否包含树B。（对应函数haSubStructure(A, B)）
+
+B、算法流程：
+   名词规定：树A的根节点记作节点A，树B的根节点称为节点B。
+   
+haSubStructure(A, B)函数：
+1、终止条件：
+    1.1、当节点 B 为空：说明树 B 已匹配完成（越过叶子节点），因此返回true ；
+    1.2、当节点 A 为空：说明已经越过树 A 叶子节点，即匹配失败，返回 false ；
+    1.3、当节点 A 和 B 的值不同：说明匹配失败，返回 false；
+2、返回值：
+    2.1、判断 A 和 B 的左子节点是否相等，即 haSubStructure(A.left, B.left) ；
+    2.2、判断 A 和 B 的右子节点是否相等，即 haSubStructure(A.right, B.right) ；
+
+isSubStructure(A, B) 函数：
+1、特例处理： 当 树 A 为空 或 树 BB 为空 时，直接返回 false；
+2、返回值： 若树 B 是树 A的子结构，则必满足以下三种情况之一，因此用或 || 连接；
+    2.1、以 节点 A 为根节点的子树包含树 B ，对应 recur(A, B)；
+    2.2、树 B是 树 A 左子树 的子结构，对应 isSubStructure(A.left, B)；
+    2.3、树 B是 树 A 右子树 的子结构，对应 isSubStructure(A.right, B)；
+以上 2.2和2.3 实质上是在对树A做先序遍历 。
+
+C、复杂度分析：
+    时间复杂度 O(MN) ： 其中 M,N 分别为树 A 和 树 B 的节点数量；先序遍历树 A 占用 O(M) ，每次调用 haSubStructure(A, B) 判断占用 O(N) 。
+    空间复杂度 O(M) ： 当树 A 和树 B 都退化为链表时，递归调用深度最大。当 M≤N 时，遍历树 A 与递归判断的总递归深度为 M ；当 M>=N 时，最差情况为遍历至树 A 叶子节点，此时总递归深度为 M。
+
+
+三、代码
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean isSubStructure(TreeNode A, TreeNode B) {
+        if(A == null || B == null) {
+            return false;
+        }
+        //先找根相同的节点；
+        //然后根据B来遍历A
+        //如果遍历完B，A相同，则完事儿
+        //否则继续找根相同的节点
+        return hasSubStructure(A,B) || isSubStructure(A.left,B) || isSubStructure(A.right,B);
+    }
+
+    public boolean hasSubStructure(TreeNode A,TreeNode B) {
+        if (B == null) {    //当节点BB为空：说明树B已匹配完成（越过叶子节点）,因此返回 truetrue;
+            return true;
+        }
+        if (A == null) {   //当节点A为空：说明已经越过树A叶子节点，即匹配失败,返回 falsefalse;
+            return false;
+        }
+
+        return A.val == B.val && hasSubStructure(A.left,B.left) && hasSubStructure(A.right,B.right);
+    }
+}
+
+
+四、结果分析
+
+执行结果：通过
+执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+内存消耗：41.3 MB, 在所有 Java 提交中击败了72.44%的用户
