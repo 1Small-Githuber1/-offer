@@ -1,0 +1,136 @@
+一、问题描述：剑指 Offer 28. 对称的二叉树
+
+请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+
+例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+
+    1
+   / \
+  2   2
+   \   \
+   3    3
+
+示例 1：
+输入：root = [1,2,2,3,4,4,3]
+输出：true
+
+示例 2：
+输入：root = [1,2,2,null,3,null,3]
+输出：false
+
+限制：0 <= 节点个数 <= 1000
+
+
+二、思路分析
+    递归的思路，不用我说，大家肯定都已经想到了，但是递归要做的事情，还是要拎出重点讲一下，加深印象：
+    
+做递归思考三步：
+1、递归的函数要干什么？
+    函数的作用是判断传入的两个树是否镜像。
+    输入：TreeNode left, TreeNode right
+    输出：是：true，不是：false
+
+2、递归停止的条件是什么？
+    左节点和右节点都为空 -> 倒底了都长得一样 ->true
+    左节点为空的时候右节点不为空，或反之 -> 长得不一样-> false
+    左右节点值不相等 -> 长得不一样 -> false
+
+3、从某层到下一层的关系是什么？
+    要想两棵树镜像，那么一棵树左边的左边要和二棵树右边的右边镜像，一棵树左边的右边要和二棵树右边的左边镜像
+    调用递归函数传入左左和右右
+    调用递归函数传入左右和右左
+    只有左左和右右镜像且左右和右左镜像的时候，我们才能说这两棵树是镜像的
+    调用递归函数，我们想知道它的左右孩子是否镜像，传入的值是root的左孩子和右孩子。这之前记得判个root==null。
+    
+    
+具体思路如下：(以下摘自jyd大佬的流程，太细了，牛bi格拉斯）
+（1）对称二叉树定义： 对于树中 任意两个对称节点 LL 和 RR ，一定有：
+    L.val = R.valL.val=R.val ：即此两对称节点值相等。
+    L.left.val = R.right.valL.left.val=R.right.val ：即 LL 的 左子节点 和 RR 的 右子节点 对称；
+    L.right.val = R.left.valL.right.val=R.left.val ：即 LL 的 右子节点 和 RR 的 左子节点 对称。
+（2）根据以上规律，考虑从顶至底递归，判断每对节点是否对称，从而判断树是否为对称二叉树。
+
+（3）算法流程：
+isSymmetric(root) ：
+    特例处理： 若根节点 root 为空，则直接返回 truetrue 
+    返回值： 即 recur(root.left, root.right) ;
+    
+recur(L, R) ：
+    终止条件：
+        当 LL 和 RR 同时越过叶节点： 此树从顶至底的节点都对称，因此返回 truetrue ；
+        当 LL 或 RR 中只有一个越过叶节点： 此树不对称，因此返回 falsefalse ；
+        当节点 LL 值 != 节点 RR 值： 此树不对称，因此返回 falsefalse ；
+
+    递推工作：
+        判断两节点 L.leftL.left 和 R.rightR.right 是否对称，即 recur(L.left, R.right) ；
+        判断两节点 L.rightL.right 和 R.leftR.left 是否对称，即 recur(L.right, R.left) ；
+    
+    返回值： 两对节点都对称时，才是对称树，因此用与逻辑符 && 连接。
+
+
+
+三、代码
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        //方法一：递归
+        
+        if(root == null) {
+            return true;
+        }
+        return judgeEqual(root.left,root.right);
+        */
+        
+        //方法二：新建一个镜像二叉树，和原本的二叉树进行比较
+        /*
+        if(root==null) return true;
+        TreeNode orRoot = root;   //表示原本的二叉树
+        TreeNode mirRoot = mirrorTree(root);    //表示镜像二叉树
+        return match(orRoot,mirRoot);    //匹配方法
+        */
+
+    }
+
+
+    /*
+    //镜像二叉树
+    public TreeNode mirrorTree(TreeNode root) {    
+        if(root==null||(root.left==null&&root.right==null)) return root;
+        TreeNode p = new TreeNode(root.val); // 需要 new 新建节点
+        p.left = mirrorTree(root.right); // 赋值给 p 的左
+        p.right = mirrorTree(root.left); // 赋值给 p 的右
+        return p; // 应返回新建的 p 节点，而不是 root
+    }
+
+    public boolean match(TreeNode A, TreeNode B){
+        if(A==null && B==null) return true;
+        if(B==null || A==null) return false;
+        if(A.val != B.val) return false;
+        return match(A.left,B.left) && match(A.right,B.right);
+    }
+    */
+  
+  
+    private boolean judgeEqual(TreeNode leftTree,TreeNode rightTree) {
+        if(leftTree == null && rightTree == null) return true;
+        if(leftTree == null || rightTree == null) return false;
+        //左右子树根节点一致
+        return leftTree.val == rightTree.val && judgeEqual(leftTree.left,rightTree.right) && judgeEqual(leftTree.right,rightTree.left);
+    }
+    
+}
