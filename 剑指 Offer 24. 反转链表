@@ -1,0 +1,139 @@
+一、问题描述：剑指 Offer 24. 反转链表
+
+定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+
+示例:
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+ 
+限制：0 <= 节点个数 <= 5000
+
+
+二、思路分析
+（1）递归
+1、首先找到递归的出口
+    就是找到链表最后一个节点（尾结点），我们要反转当前的链表，就必须从尾结点开始，因为链表的性质就是：通过头结点来找到后面的节点进行操作，CRUD都需要从头结点开始找。
+找到当前链表的尾结点，就是反转链表的头结点（先不考虑头结点是否设立标兵）。
+    if(head == null || head.next == null)
+    
+这个条件对应两种情况：
+	当链表只有空结点时：
+	链表到尾结点时：
+以上这两种情况都归纳为寻找链表的尾结点
+
+2、递和归
+注意：
+	递归函数必须要有终止条件，否则会出错；
+	递归函数先不断调用自身，直到遇到终止条件后进行回溯，最终返回答案
+
+
+（2）迭代
+我们可以申请两个指针：
+[1]	第一个指针叫pre，最初是指向null的
+[2]	第二个指针cur指向head，然后不断遍历cur
+每次迭代到cur，都将cur的next指向pre，然后pre和cur前进一位。
+都迭代完了(cur变成null了)，pre就是最后一个节点了。
+
+
+（3）栈
+用栈的先进后出的特点，比较好理解，主要分为三步：
+（1）判断合法
+（2）进栈push
+（3）出栈pop，注意，要多留一个节点ListNode保留当前节点
+ListNode newHead = cur;
+
+
+（4）双指针
+	定义两个指针：pre和cur；pre在前cur在后。
+	每次让pre的next指向cur，实现一次局部反转
+	局部反转完成之后，pre和cur同时往前移动一个位置
+	循环上述过程，直至pre到达链表尾部
+
+
+三、代码
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        //方法一：递归
+        //执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+        //内存消耗：39.7 MB, 在所有 Java 提交中击败了35.60%的用户
+        /*
+        //递归终止条件是当前为空或者下一个节点为空
+        if(head == null || head.next == null) {
+            return head;
+        }
+        //递归调用，反转每一个节点
+        ListNode node = reverseList(head.next);
+        //每一个节点是如何反转的
+        head.next.next = head;
+        //链表有环了，这是不可以的，我们只要断开即可
+        head.next = null;
+        return node;
+        */
+
+
+        //方法二：迭代
+        //执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+        //内存消耗：39.2 MB, 在所有 Java 提交中击败了97.57%的用户
+        /*
+        //申请节点
+        ListNode pre = null,cur = head,next = null;
+        while(cur != null) {
+            //记录当前节点的下一个节点
+            next = cur.next;
+            //将当前节点指向pre
+            cur.next = pre;
+            //pre和cur都前进一位
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+        */
+
+
+
+        //方法三：栈
+        /*
+        if(head == null || head.next == null) {
+            return head;
+        }
+        Stack<ListNode> stack = new Stack();
+        //进栈
+        ListNode cur = head;
+        while(cur != null){
+            stack.push(new ListNode(cur.val)); 
+            cur = cur.next;
+        }
+
+        //出栈
+        cur = stack.pop();
+        ListNode newHead = cur;
+        while (!stack.isEmpty()) {
+            cur.next = stack.pop();
+            cur = cur.next;
+        }
+        return newHead;
+        */
+
+
+
+        //方法四：双指针
+        //执行用时：0 ms, 在所有 Java 提交中击败了100.00%的用户
+        //内存消耗：39.5 MB, 在所有 Java 提交中击败了63.85%的用户
+        ListNode cur = null,pre=head;
+        while(pre != null) {
+            ListNode newNode = pre.next;
+            pre.next = cur;
+            cur = pre;
+            pre = newNode;
+        }
+        return cur;
+    }
+}
