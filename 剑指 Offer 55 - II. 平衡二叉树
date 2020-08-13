@@ -1,0 +1,102 @@
+一、问题描述：剑指 Offer 55 - II. 平衡二叉树
+
+输入一棵二叉树的根节点，判断该树是不是平衡二叉树。如果某二叉树中任意节点的左右子树的深度相差不超过1，那么它就是一棵平衡二叉树。
+
+示例 1:
+给定二叉树 [3,9,20,null,null,15,7]
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+返回 true 。
+
+示例 2:
+给定二叉树 [1,2,2,3,3,null,null,4,4]
+
+       1
+      / \
+     2   2
+    / \
+   3   3
+  / \
+ 4   4
+返回 false 。
+
+限制：1 <= 树的结点个数 <= 10000
+
+
+二、思路分析
+（1）方法一：先序遍历 + 判断深度 （从顶至底）
+    思路：是构造一个获取当前子树的深度的函数 depth(root) （即 面试题55 - I. 二叉树的深度 ），
+通过比较某子树的左右子树的深度差 abs(depth(root.left) - depth(root.right)) <= 1 是否成立，来判断某子树是否是二叉平衡树。若所有子树都平衡，则此树平衡。
+    缺陷：此方法容易想到，但会产生大量重复计算，时间复杂度较高。
+    优化方案：见方法二
+    
+（2）方法一：后序遍历 + 剪枝 （从底至顶）
+    此方法为本题的最优解法，但剪枝的方法不易第一时间想到。
+    思路：是对二叉树做后序遍历，从底至顶返回子树深度，若判定某子树不是平衡树则 “剪枝” ，直接向上返回。
+
+算法流程：
+  recur(root) 函数：
+    返回值：
+        当节点root 左 / 右子树的深度差≤1 ：则返回当前子树的深度，即节点 root 的左 / 右子树的深度最大值 +1（ max(left, right) + 1 ）；
+        当节点root 左 / 右子树的深度差>2 ：则返回 -1 ，代表 此子树不是平衡树 。
+     终止条件：
+        当 root 为空：说明越过叶节点，因此返回高度 00 ；
+        当左（右）子树深度为 -1 ：代表此树的 左（右）子树 不是平衡树，因此剪枝，直接返回 −1 ；
+  isBalanced(root) 函数：
+     返回值： 若 recur(root) != -1 ，则说明此树平衡，返回 true； 否则返回 false 。
+
+
+
+三、代码
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        //方法一：先序遍历 + 判断深度 （从顶至底）
+        /*
+        if(root == null) return true;
+        int leftTreeHeight = getHeightTree(root.left);
+        int rightTreeHeight = getHeightTree(root.right);
+        if(Math.abs(leftTreeHeight - rightTreeHeight) <= 1) {
+            return isBalanced(root.left) && isBalanced(root.right);
+        }
+        return false;
+        */
+
+
+
+        //方法二：后序遍历 + 剪枝
+        return recur(root) != -1;
+    }
+
+
+    /* 方法一
+    private int getHeightTree(TreeNode root) {
+        if(root == null) return 0;
+        return Math.max(getHeightTree(root.left),getHeightTree(root.right)) + 1;
+    }
+    */
+
+
+    //方法二
+    private int recur(TreeNode root) {
+        if(root == null) return 0;
+        int leftHeight = recur(root.left);
+        if(leftHeight == -1) return -1;
+        int rightHeight = recur(root.right);
+        if(rightHeight == -1) return -1;
+        
+        return Math.abs(leftHeight - rightHeight) < 2 ? Math.max(leftHeight,rightHeight) + 1 : -1;
+    }
+}
